@@ -1,7 +1,7 @@
 package com.github.hummel.it.lab1
 
 class ColumnMethod(private var msg: String, private var key: String, private var gui: GUI) {
-	private val square = Array(msg.length + 3) { Array(key.length) { " " } }
+	private val square: Array<Array<String>> = Array(msg.length + 3) { Array(key.length) { " " } }
 
 	fun decode(show: Boolean): String {
 		fillDecryptTable()

@@ -24,7 +24,7 @@ fun main() {
 }
 
 class GUI : JFrame() {
-	private var mode = SignMode.RUS
+	private var mode: SignMode = SignMode.RUS
 
 	private fun selectPath(pathField: JTextField) {
 		val fileChooser = JFileChooser()

@@ -3,7 +3,7 @@ package com.github.hummel.it.lab4
 import java.io.File
 import java.math.BigInteger
 
-private const val pattern = """^(.*);;[(](\d+), (\d+)[)]$"""
+private const val pattern: String = """^(.*);;[(](\d+), (\d+)[)]$"""
 
 class Signer(
 	private var inputPath: String,

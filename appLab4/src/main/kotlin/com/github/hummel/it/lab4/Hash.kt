@@ -3,8 +3,8 @@ package com.github.hummel.it.lab4
 import java.math.BigInteger
 
 object Hash {
-	private const val ALPHABET_ENG = " ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	private const val ALPHABET_RUS = " АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
+	private const val ALPHABET_ENG: String = " ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	private const val ALPHABET_RUS: String = " АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
 
 	fun getHashCharsEng(input: String, mod: BigInteger): BigInteger {
 		var h = 100.toBigInteger()

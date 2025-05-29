@@ -26,7 +26,7 @@ fun main() {
 
 class GUI : JFrame() {
 	val alphabet: String = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
-	private var vigenere = true
+	private var vigenere: Boolean = true
 
 	private fun selectPath(pathField: JTextField) {
 		val fileChooser = JFileChooser()

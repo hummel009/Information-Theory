@@ -24,7 +24,7 @@ fun main() {
 }
 
 class GUI : JFrame() {
-	private var fast = true
+	private var fast: Boolean = true
 
 	private fun selectPath(pathField: JTextField) {
 		val fileChooser = JFileChooser()

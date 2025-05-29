@@ -5,7 +5,7 @@ import java.io.File
 class DefaultRabin(
 	private var p: Int, private var q: Int, private var b: Int, private var input: String, private var output: String
 ) : Rabin {
-	private val n = p * q
+	private val n: Int = p * q
 
 	override fun encode() {
 		val listPlain = File(input).readBytes().map { it.toInt() and 0xFF }

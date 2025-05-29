@@ -10,7 +10,7 @@ class BigIntegerRabin(
 	private var input: String,
 	private var output: String
 ) : Rabin {
-	private val n = p * q
+	private val n: BigInteger = p * q
 
 	override fun encode() {
 		val listPlain = File(input).readBytes().map { it.toInt() and 0xFF }
