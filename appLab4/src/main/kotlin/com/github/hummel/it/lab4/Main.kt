@@ -62,7 +62,7 @@ class GUI : JFrame() {
 			ValuesChecker.checkH(q, p, h)
 			ValuesChecker.checkInterval(BigInteger.ZERO, q, x)
 			ValuesChecker.checkInterval(BigInteger.ONE, q - BigInteger.ONE, k)
-		} catch (e: Exception) {
+		} catch (_: Exception) {
 			JOptionPane.showMessageDialog(this, "Wrong data", "Error", JOptionPane.ERROR_MESSAGE)
 			return true
 		}
@@ -101,7 +101,7 @@ class GUI : JFrame() {
 			val signer = Signer(inputPath, outputPath, q, p, h, k, m)
 			val cortege = try {
 				signer.design(mode, y)
-			} catch (e: Exception) {
+			} catch (_: Exception) {
 				null
 			}
 
@@ -161,7 +161,7 @@ class GUI : JFrame() {
 			val signer = Signer(inputPath, outputPath, q, p, h, k, m)
 			val cortege = try {
 				signer.ensign(mode, x)
-			} catch (e: Exception) {
+			} catch (_: Exception) {
 				null
 			}
 

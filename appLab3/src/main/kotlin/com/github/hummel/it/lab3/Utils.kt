@@ -80,22 +80,21 @@ object Utils {
 			d /= 2
 			s++
 		}
-		for (i in 1..5) {
+		repeat(5) {
 			val a = (2..(n - 2)).random()
 			var x = powMod(a, d, n)
-			if (x == 1L || x == n - 1) {
-				continue
-			}
-			var j = 1
-			while (j < s) {
-				x = powMod(x, 2, n)
-				if (x == n - 1) {
-					break
+			if (!(x == 1L || x == n - 1)) {
+				var j = 1
+				while (j < s) {
+					x = powMod(x, 2, n)
+					if (x == n - 1) {
+						break
+					}
+					j++
 				}
-				j++
-			}
-			if (x != n - 1) {
-				return false
+				if (x != n - 1) {
+					return false
+				}
 			}
 		}
 		return true
