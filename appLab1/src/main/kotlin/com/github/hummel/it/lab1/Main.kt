@@ -98,12 +98,12 @@ class CipherMachine : JFrame() {
 		val processPanel = JPanel(GridLayout(1, 2, 5, 5)).apply {
 			add(JButton("Encode").apply {
 				addActionListener {
-					process(true)
+					process(false)
 				}
 			})
 			add(JButton("Decode").apply {
 				addActionListener {
-					process(false)
+					process(true)
 				}
 			})
 		}
@@ -119,7 +119,7 @@ class CipherMachine : JFrame() {
 		setLocationRelativeTo(null)
 	}
 
-	private fun process(isEncode: Boolean) {
+	private fun process(reverse: Boolean) {
 		if (inputField.text.isEmpty() || outputField.text.isEmpty()) {
 			JOptionPane.showMessageDialog(
 				this, "Empty fields", "Error", JOptionPane.ERROR_MESSAGE
@@ -139,11 +139,11 @@ class CipherMachine : JFrame() {
 
 		val result = if (vigenereSelected) {
 			Vigenere(message, key).run {
-				if (isEncode) encode() else decode()
+				if (reverse) decode() else encode()
 			}
 		} else {
 			ColumnMethod(message, key).run {
-				if (isEncode) encode() else decode()
+				if (reverse) decode() else encode()
 			}
 		}
 

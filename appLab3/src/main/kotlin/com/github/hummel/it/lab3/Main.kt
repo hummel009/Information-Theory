@@ -6,7 +6,6 @@ import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.EventQueue
 import java.awt.GridLayout
-import java.math.BigInteger
 import javax.swing.*
 import javax.swing.border.EmptyBorder
 
@@ -141,35 +140,19 @@ class CipherMachine : JFrame() {
 				val keyQ = keyFieldQ.text.toInt()
 				val keyB = keyFieldB.text.toInt()
 
-				if (!Utils.isPrime(keyP.toLong()) || !Utils.isPrime(keyQ.toLong())) {
-					throw Exception()
-				}
-				if (!(keyB < keyP * keyQ && keyB > 0 && keyB < 10533)) {
-					throw Exception()
-				}
-				if (!(keyP > 3 && keyQ > 3511 && keyP * keyQ > 256)) {
-					throw Exception()
-				}
-				if (!(keyP % 4 == 3 && keyQ % 4 == 3)) {
-					throw Exception()
-				}
+				ValuesCheckerDefault.checkPrime(keyP)
+				ValuesCheckerDefault.checkPrime(keyQ)
+				ValuesCheckerDefault.checkB(keyB, keyP, keyQ)
+				ValuesCheckerDefault.checkPAndQ(keyP, keyQ)
 			} else {
 				val keyP = keyFieldP.text.toBigInteger()
 				val keyQ = keyFieldQ.text.toBigInteger()
 				val keyB = keyFieldB.text.toBigInteger()
 
-				if (!(keyP.isProbablePrime(95) && keyQ.isProbablePrime(95))) {
-					throw Exception()
-				}
-				if (!(keyB < keyP * keyQ && keyB > BigInteger.ZERO && keyB < 10533.toBigInteger())) {
-					throw Exception()
-				}
-				if (!(keyP > 3.toBigInteger() && keyQ > 3511.toBigInteger() && keyP * keyQ > 256.toBigInteger())) {
-					throw Exception()
-				}
-				if (!(keyP % 4.toBigInteger() == 3.toBigInteger() && keyQ % 4.toBigInteger() == 3.toBigInteger())) {
-					throw Exception()
-				}
+				ValuesCheckerBigInteger.checkPrime(keyP)
+				ValuesCheckerBigInteger.checkPrime(keyQ)
+				ValuesCheckerBigInteger.checkB(keyB, keyP, keyQ)
+				ValuesCheckerBigInteger.checkPAndQ(keyP, keyQ)
 			}
 		} catch (_: Exception) {
 			JOptionPane.showMessageDialog(
