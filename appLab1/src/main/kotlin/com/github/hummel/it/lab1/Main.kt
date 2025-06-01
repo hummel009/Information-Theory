@@ -45,10 +45,14 @@ class CipherMachine : JFrame() {
 
 		val radioPanel = JPanel().apply {
 			val vigenereButton = JRadioButton("Vigenere", true).apply {
-				addActionListener { vigenereSelected = true }
+				addActionListener {
+					vigenereSelected = true
+				}
 			}
 			val columnButton = JRadioButton("Column Method").apply {
-				addActionListener { vigenereSelected = false }
+				addActionListener {
+					vigenereSelected = false
+				}
 			}
 			ButtonGroup().apply {
 				add(vigenereButton)
@@ -65,7 +69,9 @@ class CipherMachine : JFrame() {
 			add(inputField, BorderLayout.CENTER)
 			add(JButton("Browse").apply {
 				preferredSize = Dimension(100, preferredSize.height)
-				addActionListener { selectPath(inputField) }
+				addActionListener {
+					selectPath(inputField)
+				}
 			}, BorderLayout.EAST)
 		}
 
@@ -76,7 +82,9 @@ class CipherMachine : JFrame() {
 			add(outputField, BorderLayout.CENTER)
 			add(JButton("Browse").apply {
 				preferredSize = Dimension(100, preferredSize.height)
-				addActionListener { selectPath(outputField) }
+				addActionListener {
+					selectPath(outputField)
+				}
 			}, BorderLayout.EAST)
 		}
 
@@ -89,10 +97,14 @@ class CipherMachine : JFrame() {
 
 		val processPanel = JPanel(GridLayout(1, 2, 5, 5)).apply {
 			add(JButton("Encode").apply {
-				addActionListener { process(true) }
+				addActionListener {
+					process(true)
+				}
 			})
 			add(JButton("Decode").apply {
-				addActionListener { process(false) }
+				addActionListener {
+					process(false)
+				}
 			})
 		}
 
