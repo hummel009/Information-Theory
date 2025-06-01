@@ -11,12 +11,14 @@ import java.util.*
 import javax.swing.*
 import javax.swing.border.EmptyBorder
 
+const val alphabet: String = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
+
 fun main() {
 	FlatLightLaf.setup()
 	EventQueue.invokeLater {
 		try {
 			UIManager.setLookAndFeel(FlatMTGitHubDarkIJTheme())
-			val frame = GUI()
+			val frame = CipherMachine()
 			frame.isVisible = true
 		} catch (e: Exception) {
 			e.printStackTrace()
@@ -24,150 +26,132 @@ fun main() {
 	}
 }
 
-class GUI : JFrame() {
-	val alphabet: String = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
-	private var vigenere: Boolean = true
+class CipherMachine : JFrame() {
+	private var vigenereSelected: Boolean = true
+
+	private val inputField: JTextField = JTextField(20)
+	private val outputField: JTextField = JTextField(20)
+	private val keyField: JTextField = JTextField(20)
 
 	init {
 		title = "Vigenere & Column Cipher Machine"
 		defaultCloseOperation = EXIT_ON_CLOSE
-		setBounds(100, 100, 450, 210)
+		setBounds(100, 100, 600, 270)
 
-		val contentPanel = JPanel()
-		contentPanel.border = EmptyBorder(5, 5, 5, 5)
-		contentPanel.layout = BorderLayout(0, 0)
-		contentPanel.layout = GridLayout(0, 1, 0, 0)
-		contentPane = contentPanel
-
-		val inputPanel = JPanel()
-		val inputLabel = JLabel("Input path:")
-		inputLabel.preferredSize = Dimension(80, inputLabel.preferredSize.height)
-		val inputField = JTextField(20)
-		val inputButton = JButton("Select path")
-		inputButton.addActionListener { selectPath(inputField) }
-		inputPanel.add(inputLabel)
-		inputPanel.add(inputField)
-		inputPanel.add(inputButton)
-
-		val outputPanel = JPanel()
-		val outputLabel = JLabel("Output path:")
-		outputLabel.preferredSize = Dimension(80, outputLabel.preferredSize.height)
-		val outputField = JTextField(20)
-		val outputButton = JButton("Select path")
-		outputButton.addActionListener { selectPath(outputField) }
-		outputPanel.add(outputLabel)
-		outputPanel.add(outputField)
-		outputPanel.add(outputButton)
-
-		val keyPanel = JPanel()
-		val keyLabel = JLabel("Key:")
-		val keyField = JTextField(20)
-		keyPanel.add(keyLabel)
-		keyPanel.add(keyField)
-
-		val radioPanel = JPanel()
-		val radioVigenere = JRadioButton("Vigenere")
-		val radioColumn = JRadioButton("Column Method")
-		radioVigenere.isSelected = true
-		radioVigenere.addActionListener {
-			vigenere = true
-			radioColumn.isSelected = false
+		val contentPanel = JPanel().apply {
+			border = EmptyBorder(10, 10, 10, 10)
+			layout = GridLayout(0, 1, 5, 10)
 		}
-		radioColumn.addActionListener {
-			vigenere = false
-			radioVigenere.isSelected = false
+
+		val radioPanel = JPanel().apply {
+			val vigenereButton = JRadioButton("Vigenere", true).apply {
+				addActionListener { vigenereSelected = true }
+			}
+			val columnButton = JRadioButton("Column Method").apply {
+				addActionListener { vigenereSelected = false }
+			}
+			ButtonGroup().apply {
+				add(vigenereButton)
+				add(columnButton)
+			}
+			add(vigenereButton)
+			add(columnButton)
 		}
-		radioPanel.add(radioVigenere)
-		radioPanel.add(radioColumn)
 
-		val processPanel = JPanel()
-		val processEncode = JButton("Encode")
-		val processDecode = JButton("Decode")
-		processEncode.addActionListener { encode(inputField, outputField, keyField) }
-		processDecode.addActionListener { decode(inputField, outputField, keyField) }
-		processPanel.add(processEncode)
-		processPanel.add(processDecode)
+		val inputPanel = JPanel(BorderLayout(5, 5)).apply {
+			add(JLabel("Input path:").apply {
+				preferredSize = Dimension(100, preferredSize.height)
+			}, BorderLayout.WEST)
+			add(inputField, BorderLayout.CENTER)
+			add(JButton("Select...").apply {
+				preferredSize = Dimension(100, preferredSize.height)
+				addActionListener { selectPath(inputField) }
+			}, BorderLayout.EAST)
+		}
 
+		val outputPanel = JPanel(BorderLayout(5, 5)).apply {
+			add(JLabel("Output path:").apply {
+				preferredSize = Dimension(100, preferredSize.height)
+			}, BorderLayout.WEST)
+			add(outputField, BorderLayout.CENTER)
+			add(JButton("Select...").apply {
+				preferredSize = Dimension(100, preferredSize.height)
+				addActionListener { selectPath(outputField) }
+			}, BorderLayout.EAST)
+		}
+
+		val keyPanel = JPanel(BorderLayout(5, 5)).apply {
+			add(JLabel("Key:").apply {
+				preferredSize = Dimension(100, preferredSize.height)
+			}, BorderLayout.WEST)
+			add(keyField, BorderLayout.CENTER)
+		}
+
+		val processPanel = JPanel(GridLayout(1, 2, 5, 5)).apply {
+			add(JButton("Encode").apply {
+				addActionListener { process(true) }
+			})
+			add(JButton("Decode").apply {
+				addActionListener { process(false) }
+			})
+		}
+
+		contentPanel.add(radioPanel)
 		contentPanel.add(inputPanel)
 		contentPanel.add(outputPanel)
-		contentPanel.add(radioPanel)
 		contentPanel.add(keyPanel)
 		contentPanel.add(processPanel)
 
+		contentPane = contentPanel
 		setLocationRelativeTo(null)
 	}
 
-	private fun encode(inputField: JTextField, outputField: JTextField, keyField: JTextField) {
-		val data = error(inputField, outputField, keyField)
-		val error = data.first
-
-		if (!error) {
-			val key = data.second.first
-			val msg = data.second.second
-
-			val res = if (vigenere) {
-				val machine = Vigenere(msg, key, this)
-				machine.encode()
-			} else {
-				val machine = ColumnMethod(msg, key, this)
-				machine.encode(false)
-			}
-
-			File(outputField.text).writeText(res)
-
-			JOptionPane.showMessageDialog(this, "Complete", "Message", JOptionPane.INFORMATION_MESSAGE)
+	private fun process(isEncode: Boolean) {
+		val (hasError, key, message) = validateInputs()
+		if (hasError) {
+			return
 		}
+
+		val result = if (vigenereSelected) {
+			Vigenere(message, key).run {
+				if (isEncode) encode() else decode()
+			}
+		} else {
+			ColumnMethod(message, key).run {
+				if (isEncode) encode() else decode()
+			}
+		}
+
+		File(outputField.text).writeText(result)
+		JOptionPane.showMessageDialog(this, "Operation completed", "Success", JOptionPane.INFORMATION_MESSAGE)
 	}
 
-	private fun decode(inputField: JTextField, outputField: JTextField, keyField: JTextField) {
-		val data = error(inputField, outputField, keyField)
-		val error = data.first
-
-		if (!error) {
-			val key = data.second.first
-			val msg = data.second.second
-
-			val res = if (vigenere) {
-				val machine = Vigenere(msg, key, this)
-				machine.decode()
-			} else {
-				val machine = ColumnMethod(msg, key, this)
-				machine.decode(false)
-			}
-
-			File(outputField.text).writeText(res)
-
-			JOptionPane.showMessageDialog(this, "Complete", "Message", JOptionPane.INFORMATION_MESSAGE)
-		}
-	}
-
-	private fun error(
-		inputField: JTextField, outputField: JTextField, keyField: JTextField
-	): Pair<Boolean, Pair<String, String>> {
-		val inputPath = inputField.text
-		val outputPath = outputField.text
-
-		if (inputPath.isEmpty() || outputPath.isEmpty()) {
-			JOptionPane.showMessageDialog(this, "Empty fields", "Error", JOptionPane.ERROR_MESSAGE)
-			return true to ("" to "")
+	private fun validateInputs(): Triple<Boolean, String, String> {
+		if (inputField.text.isEmpty() || outputField.text.isEmpty()) {
+			showError("Please fill all fields")
+			return Triple(true, "", "")
 		}
 
 		val key = keyField.text.uppercase(Locale.getDefault()).filter { it in alphabet }
-		val msg = File(inputPath).readText().uppercase(Locale.getDefault()).filter { it in alphabet }
+		val message = File(inputField.text).readText().uppercase(Locale.getDefault()).filter { it in alphabet }
 
-		if (key.isEmpty() || msg.isEmpty()) {
-			JOptionPane.showMessageDialog(this, "Wrong data", "Error", JOptionPane.ERROR_MESSAGE)
-			return true to ("" to "")
+		if (key.isEmpty() || message.isEmpty()) {
+			showError("Invalid key or message content")
+			return Triple(true, "", "")
 		}
 
-		return false to (key to msg)
+		return Triple(false, key, message)
 	}
 
-	private fun selectPath(pathField: JTextField) {
-		val fileChooser = JFileChooser()
-		val result = fileChooser.showOpenDialog(this)
-		if (result == JFileChooser.APPROVE_OPTION) {
-			pathField.text = fileChooser.selectedFile.absolutePath
+	private fun selectPath(field: JTextField) {
+		JFileChooser().run {
+			if (showOpenDialog(this@CipherMachine) == JFileChooser.APPROVE_OPTION) {
+				field.text = selectedFile.absolutePath
+			}
 		}
+	}
+
+	private fun showError(message: String) {
+		JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE)
 	}
 }

@@ -1,7 +1,9 @@
 package com.github.hummel.it.lab1
 
-class ColumnMethod(private var msg: String, private var key: String, private var gui: GUI) {
+class ColumnMethod(private var msg: String, private var key: String) {
 	private val square: Array<Array<String>> = Array(msg.length + 3) { Array(key.length) { " " } }
+
+	fun decode(): String = decode(false)
 
 	fun decode(show: Boolean): String {
 		fillDecryptTable()
@@ -10,6 +12,8 @@ class ColumnMethod(private var msg: String, private var key: String, private var
 		}
 		return scanDecryptTable()
 	}
+
+	fun encode(): String = encode(false)
 
 	fun encode(show: Boolean): String {
 		fillEncryptTable()
@@ -113,7 +117,7 @@ class ColumnMethod(private var msg: String, private var key: String, private var
 	private fun prepareTable() {
 		for (i in key.indices) {
 			square[0][i] = "${key[i]}"
-			square[1][i] = gui.alphabet.indexOf(square[0][i]).toString()
+			square[1][i] = alphabet.indexOf(square[0][i]).toString()
 			square[2][i] = (i + 1).toString()
 		}
 
