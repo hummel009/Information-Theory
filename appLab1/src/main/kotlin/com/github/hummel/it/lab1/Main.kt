@@ -28,80 +28,6 @@ class GUI : JFrame() {
 	val alphabet: String = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
 	private var vigenere: Boolean = true
 
-	private fun selectPath(pathField: JTextField) {
-		val fileChooser = JFileChooser()
-		val result = fileChooser.showOpenDialog(this)
-		if (result == JFileChooser.APPROVE_OPTION) {
-			pathField.text = fileChooser.selectedFile.absolutePath
-		}
-	}
-
-	private fun error(
-		inputField: JTextField, outputField: JTextField, keyField: JTextField
-	): Pair<Boolean, Pair<String, String>> {
-		val inputPath = inputField.text
-		val outputPath = outputField.text
-
-		if (inputPath.isEmpty() || outputPath.isEmpty()) {
-			JOptionPane.showMessageDialog(this, "Empty fields", "Error", JOptionPane.ERROR_MESSAGE)
-			return true to ("" to "")
-		}
-
-		val key = keyField.text.uppercase(Locale.getDefault()).filter { it in alphabet }
-		val msg = File(inputPath).readText().uppercase(Locale.getDefault()).filter { it in alphabet }
-
-		if (key.isEmpty() || msg.isEmpty()) {
-			JOptionPane.showMessageDialog(this, "Wrong data", "Error", JOptionPane.ERROR_MESSAGE)
-			return true to ("" to "")
-		}
-
-		return false to (key to msg)
-	}
-
-	private fun encode(inputField: JTextField, outputField: JTextField, keyField: JTextField) {
-		val data = error(inputField, outputField, keyField)
-		val error = data.first
-
-		if (!error) {
-			val key = data.second.first
-			val msg = data.second.second
-
-			val res = if (vigenere) {
-				val machine = Vigenere(msg, key, this)
-				machine.encode()
-			} else {
-				val machine = ColumnMethod(msg, key, this)
-				machine.encode(false)
-			}
-
-			File(outputField.text).writeText(res)
-
-			JOptionPane.showMessageDialog(this, "Complete", "Message", JOptionPane.INFORMATION_MESSAGE)
-		}
-	}
-
-	private fun decode(inputField: JTextField, outputField: JTextField, keyField: JTextField) {
-		val data = error(inputField, outputField, keyField)
-		val error = data.first
-
-		if (!error) {
-			val key = data.second.first
-			val msg = data.second.second
-
-			val res = if (vigenere) {
-				val machine = Vigenere(msg, key, this)
-				machine.decode()
-			} else {
-				val machine = ColumnMethod(msg, key, this)
-				machine.decode(false)
-			}
-
-			File(outputField.text).writeText(res)
-
-			JOptionPane.showMessageDialog(this, "Complete", "Message", JOptionPane.INFORMATION_MESSAGE)
-		}
-	}
-
 	init {
 		title = "Vigenere & Column Cipher Machine"
 		defaultCloseOperation = EXIT_ON_CLOSE
@@ -169,5 +95,79 @@ class GUI : JFrame() {
 		contentPanel.add(processPanel)
 
 		setLocationRelativeTo(null)
+	}
+
+	private fun encode(inputField: JTextField, outputField: JTextField, keyField: JTextField) {
+		val data = error(inputField, outputField, keyField)
+		val error = data.first
+
+		if (!error) {
+			val key = data.second.first
+			val msg = data.second.second
+
+			val res = if (vigenere) {
+				val machine = Vigenere(msg, key, this)
+				machine.encode()
+			} else {
+				val machine = ColumnMethod(msg, key, this)
+				machine.encode(false)
+			}
+
+			File(outputField.text).writeText(res)
+
+			JOptionPane.showMessageDialog(this, "Complete", "Message", JOptionPane.INFORMATION_MESSAGE)
+		}
+	}
+
+	private fun decode(inputField: JTextField, outputField: JTextField, keyField: JTextField) {
+		val data = error(inputField, outputField, keyField)
+		val error = data.first
+
+		if (!error) {
+			val key = data.second.first
+			val msg = data.second.second
+
+			val res = if (vigenere) {
+				val machine = Vigenere(msg, key, this)
+				machine.decode()
+			} else {
+				val machine = ColumnMethod(msg, key, this)
+				machine.decode(false)
+			}
+
+			File(outputField.text).writeText(res)
+
+			JOptionPane.showMessageDialog(this, "Complete", "Message", JOptionPane.INFORMATION_MESSAGE)
+		}
+	}
+
+	private fun error(
+		inputField: JTextField, outputField: JTextField, keyField: JTextField
+	): Pair<Boolean, Pair<String, String>> {
+		val inputPath = inputField.text
+		val outputPath = outputField.text
+
+		if (inputPath.isEmpty() || outputPath.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "Empty fields", "Error", JOptionPane.ERROR_MESSAGE)
+			return true to ("" to "")
+		}
+
+		val key = keyField.text.uppercase(Locale.getDefault()).filter { it in alphabet }
+		val msg = File(inputPath).readText().uppercase(Locale.getDefault()).filter { it in alphabet }
+
+		if (key.isEmpty() || msg.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "Wrong data", "Error", JOptionPane.ERROR_MESSAGE)
+			return true to ("" to "")
+		}
+
+		return false to (key to msg)
+	}
+
+	private fun selectPath(pathField: JTextField) {
+		val fileChooser = JFileChooser()
+		val result = fileChooser.showOpenDialog(this)
+		if (result == JFileChooser.APPROVE_OPTION) {
+			pathField.text = fileChooser.selectedFile.absolutePath
+		}
 	}
 }
