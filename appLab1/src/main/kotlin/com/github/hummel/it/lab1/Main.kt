@@ -132,7 +132,7 @@ class CipherMachine : JFrame() {
 
 		if (key.isEmpty() || message.isEmpty()) {
 			JOptionPane.showMessageDialog(
-				this, "Invalid key or message content", "Error", JOptionPane.ERROR_MESSAGE
+				this, "Wrong data", "Error", JOptionPane.ERROR_MESSAGE
 			)
 			return
 		}

@@ -15,7 +15,7 @@ fun main() {
 	EventQueue.invokeLater {
 		try {
 			UIManager.setLookAndFeel(FlatMTGitHubDarkIJTheme())
-			val frame = GUI()
+			val frame = CipherMachine()
 			frame.isVisible = true
 		} catch (e: Exception) {
 			e.printStackTrace()
@@ -23,165 +23,8 @@ fun main() {
 	}
 }
 
-class GUI : JFrame() {
+class CipherMachine : JFrame() {
 	private var mode: SignMode = SignMode.RUS
-
-	private fun selectPath(pathField: JTextField) {
-		val fileChooser = JFileChooser()
-		val result = fileChooser.showOpenDialog(this)
-		if (result == JFileChooser.APPROVE_OPTION) {
-			pathField.text = fileChooser.selectedFile.absolutePath
-		}
-	}
-
-	private fun error(
-		inputField: JTextField,
-		outputField: JTextField,
-		keyFieldQ: JTextField,
-		keyFieldP: JTextField,
-		keyFieldH: JTextField,
-		keyFieldX: JTextField,
-		keyFieldY: JTextField,
-		keyFieldK: JTextField,
-		keyFieldM: JTextField
-	): Boolean {
-		if (inputField.text.isEmpty() || outputField.text.isEmpty() || keyFieldQ.text.isEmpty() || keyFieldP.text.isEmpty() || keyFieldH.text.isEmpty() || keyFieldK.text.isEmpty() || keyFieldM.text.isEmpty()) {
-			JOptionPane.showMessageDialog(this, "Empty fields", "Error", JOptionPane.ERROR_MESSAGE)
-			return true
-		}
-		try {
-			val q = keyFieldQ.text.toBigInteger()
-			val p = keyFieldP.text.toBigInteger()
-			val h = keyFieldH.text.toBigInteger()
-			val x = keyFieldX.text.toBigInteger()
-			val k = keyFieldK.text.toBigInteger()
-			keyFieldM.text.toBigInteger()
-			keyFieldY.text.toBigInteger()
-			ValuesChecker.checkQ(q)
-			ValuesChecker.checkP(p, q)
-			ValuesChecker.checkH(q, p, h)
-			ValuesChecker.checkInterval(BigInteger.ZERO, q, x)
-			ValuesChecker.checkInterval(BigInteger.ONE, q - BigInteger.ONE, k)
-		} catch (_: Exception) {
-			JOptionPane.showMessageDialog(this, "Wrong data", "Error", JOptionPane.ERROR_MESSAGE)
-			return true
-		}
-		return false
-	}
-
-	private fun design(
-		inputField: JTextField,
-		outputField: JTextField,
-		keyFieldQ: JTextField,
-		keyFieldP: JTextField,
-		keyFieldH: JTextField,
-		keyFieldX: JTextField,
-		keyFieldY: JTextField,
-		keyFieldK: JTextField,
-		keyFieldM: JTextField
-	) {
-		val error =
-			error(inputField, outputField, keyFieldQ, keyFieldP, keyFieldH, keyFieldX, keyFieldY, keyFieldK, keyFieldM)
-
-		if (keyFieldY.text.isEmpty()) {
-			JOptionPane.showMessageDialog(this, "Select Y", "Error", JOptionPane.ERROR_MESSAGE)
-			return
-		}
-
-		if (!error) {
-			val inputPath = inputField.text
-			val outputPath = outputField.text
-			val q = keyFieldQ.text.toBigInteger()
-			val p = keyFieldP.text.toBigInteger()
-			val h = keyFieldH.text.toBigInteger()
-			val y = keyFieldY.text.toBigInteger()
-			val k = keyFieldK.text.toBigInteger()
-			val m = keyFieldM.text.toBigInteger()
-
-			val signer = Signer(inputPath, outputPath, q, p, h, k, m)
-			val cortege = try {
-				signer.design(mode, y)
-			} catch (_: Exception) {
-				null
-			}
-
-			cortege?.let {
-				val hash = it.value1
-				val r = it.value2
-				val s = it.value3
-				val w = it.value4
-				val u1 = it.value5
-				val u2 = it.value6
-				val v = it.value7
-				JOptionPane.showMessageDialog(
-					this,
-					"Hash = $hash, R = $r, S = $s, W = $w, U1 = $u1, U2 = $u2, V = $v\r\n${r == v}",
-					"Message",
-					JOptionPane.INFORMATION_MESSAGE
-				)
-				keyFieldX.text = "45"
-				keyFieldY.text = "0"
-			} ?: run {
-				JOptionPane.showMessageDialog(
-					this, "Broken file", "Error", JOptionPane.ERROR_MESSAGE
-				)
-			}
-		}
-	}
-
-	private fun ensign(
-		inputField: JTextField,
-		outputField: JTextField,
-		keyFieldQ: JTextField,
-		keyFieldP: JTextField,
-		keyFieldH: JTextField,
-		keyFieldX: JTextField,
-		keyFieldY: JTextField,
-		keyFieldK: JTextField,
-		keyFieldM: JTextField
-	) {
-		val error =
-			error(inputField, outputField, keyFieldQ, keyFieldP, keyFieldH, keyFieldX, keyFieldY, keyFieldK, keyFieldM)
-
-		if (keyFieldX.text.isEmpty()) {
-			JOptionPane.showMessageDialog(this, "Select X", "Error", JOptionPane.ERROR_MESSAGE)
-			return
-		}
-
-		if (!error) {
-			val inputPath = inputField.text
-			val outputPath = outputField.text
-			val q = keyFieldQ.text.toBigInteger()
-			val p = keyFieldP.text.toBigInteger()
-			val h = keyFieldH.text.toBigInteger()
-			val x = keyFieldX.text.toBigInteger()
-			val k = keyFieldK.text.toBigInteger()
-			val m = keyFieldM.text.toBigInteger()
-
-			val signer = Signer(inputPath, outputPath, q, p, h, k, m)
-			val cortege = try {
-				signer.ensign(mode, x)
-			} catch (_: Exception) {
-				null
-			}
-
-			cortege?.let {
-				val hash = it.value1
-				val r = it.value2
-				val s = it.value3
-				val y = it.value4
-				JOptionPane.showMessageDialog(
-					this, "Hash = $hash, r = $r, s = $s, y = $y", "Message", JOptionPane.INFORMATION_MESSAGE
-				)
-				keyFieldX.text = "0"
-				keyFieldY.text = "$y"
-			} ?: run {
-				JOptionPane.showMessageDialog(
-					this, "Broken file", "Error", JOptionPane.ERROR_MESSAGE
-				)
-			}
-		}
-	}
 
 	init {
 		title = "DSA Signer Machine"
@@ -317,6 +160,170 @@ class GUI : JFrame() {
 		contentPanel.add(processPanel)
 
 		setLocationRelativeTo(null)
+	}
+
+	private fun ensign(
+		inputField: JTextField,
+		outputField: JTextField,
+		keyFieldQ: JTextField,
+		keyFieldP: JTextField,
+		keyFieldH: JTextField,
+		keyFieldX: JTextField,
+		keyFieldY: JTextField,
+		keyFieldK: JTextField,
+		keyFieldM: JTextField
+	) {
+		if (error(
+				inputField, outputField, keyFieldQ, keyFieldP, keyFieldH, keyFieldX, keyFieldY, keyFieldK, keyFieldM
+			)
+		) {
+			return
+		}
+
+		if (keyFieldX.text.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "Select X", "Error", JOptionPane.ERROR_MESSAGE)
+			return
+		}
+
+		val inputPath = inputField.text
+		val outputPath = outputField.text
+		val q = keyFieldQ.text.toBigInteger()
+		val p = keyFieldP.text.toBigInteger()
+		val h = keyFieldH.text.toBigInteger()
+		val x = keyFieldX.text.toBigInteger()
+		val k = keyFieldK.text.toBigInteger()
+		val m = keyFieldM.text.toBigInteger()
+
+		val signer = Signer(inputPath, outputPath, q, p, h, k, m)
+
+		val cortege = try {
+			signer.ensign(mode, x)
+		} catch (_: Exception) {
+			null
+		}
+
+		cortege?.let {
+			val hash = it.value1
+			val r = it.value2
+			val s = it.value3
+			val y = it.value4
+			JOptionPane.showMessageDialog(
+				this, "Hash = $hash, r = $r, s = $s, y = $y", "Message", JOptionPane.INFORMATION_MESSAGE
+			)
+			keyFieldX.text = "0"
+			keyFieldY.text = "$y"
+		} ?: run {
+			JOptionPane.showMessageDialog(
+				this, "Broken file", "Error", JOptionPane.ERROR_MESSAGE
+			)
+		}
+	}
+
+	private fun design(
+		inputField: JTextField,
+		outputField: JTextField,
+		keyFieldQ: JTextField,
+		keyFieldP: JTextField,
+		keyFieldH: JTextField,
+		keyFieldX: JTextField,
+		keyFieldY: JTextField,
+		keyFieldK: JTextField,
+		keyFieldM: JTextField
+	) {
+		if (error(
+				inputField, outputField, keyFieldQ, keyFieldP, keyFieldH, keyFieldX, keyFieldY, keyFieldK, keyFieldM
+			)
+		) {
+			return
+		}
+
+		if (keyFieldY.text.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "Select Y", "Error", JOptionPane.ERROR_MESSAGE)
+			return
+		}
+
+		val inputPath = inputField.text
+		val outputPath = outputField.text
+		val q = keyFieldQ.text.toBigInteger()
+		val p = keyFieldP.text.toBigInteger()
+		val h = keyFieldH.text.toBigInteger()
+		val y = keyFieldY.text.toBigInteger()
+		val k = keyFieldK.text.toBigInteger()
+		val m = keyFieldM.text.toBigInteger()
+
+		val signer = Signer(inputPath, outputPath, q, p, h, k, m)
+
+		val cortege = try {
+			signer.design(mode, y)
+		} catch (_: Exception) {
+			null
+		}
+
+		cortege?.let {
+			val hash = it.value1
+			val r = it.value2
+			val s = it.value3
+			val w = it.value4
+			val u1 = it.value5
+			val u2 = it.value6
+			val v = it.value7
+			JOptionPane.showMessageDialog(
+				this,
+				"Hash = $hash, R = $r, S = $s, W = $w, U1 = $u1, U2 = $u2, V = $v\r\n${r == v}",
+				"Message",
+				JOptionPane.INFORMATION_MESSAGE
+			)
+			keyFieldX.text = "45"
+			keyFieldY.text = "0"
+		} ?: run {
+			JOptionPane.showMessageDialog(
+				this, "Broken file", "Error", JOptionPane.ERROR_MESSAGE
+			)
+		}
+	}
+
+	private fun error(
+		inputField: JTextField,
+		outputField: JTextField,
+		keyFieldQ: JTextField,
+		keyFieldP: JTextField,
+		keyFieldH: JTextField,
+		keyFieldX: JTextField,
+		keyFieldY: JTextField,
+		keyFieldK: JTextField,
+		keyFieldM: JTextField
+	): Boolean {
+		if (inputField.text.isEmpty() || outputField.text.isEmpty() || keyFieldQ.text.isEmpty() || keyFieldP.text.isEmpty() || keyFieldH.text.isEmpty() || keyFieldK.text.isEmpty() || keyFieldM.text.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "Empty fields", "Error", JOptionPane.ERROR_MESSAGE)
+			return true
+		}
+		try {
+			val q = keyFieldQ.text.toBigInteger()
+			val p = keyFieldP.text.toBigInteger()
+			val h = keyFieldH.text.toBigInteger()
+			val x = keyFieldX.text.toBigInteger()
+			val k = keyFieldK.text.toBigInteger()
+			keyFieldM.text.toBigInteger()
+			keyFieldY.text.toBigInteger()
+			ValuesChecker.checkQ(q)
+			ValuesChecker.checkP(p, q)
+			ValuesChecker.checkH(q, p, h)
+			ValuesChecker.checkInterval(BigInteger.ZERO, q, x)
+			ValuesChecker.checkInterval(BigInteger.ONE, q - BigInteger.ONE, k)
+		} catch (_: Exception) {
+			JOptionPane.showMessageDialog(this, "Wrong data", "Error", JOptionPane.ERROR_MESSAGE)
+			return true
+		}
+		return false
+	}
+
+
+	private fun selectPath(field: JTextField) {
+		JFileChooser().run {
+			if (showOpenDialog(this@CipherMachine) == JFileChooser.APPROVE_OPTION) {
+				field.text = selectedFile.absolutePath
+			}
+		}
 	}
 }
 

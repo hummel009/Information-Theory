@@ -171,7 +171,9 @@ class CipherMachine : JFrame() {
 				}
 			}
 		} catch (_: Exception) {
-			JOptionPane.showMessageDialog(this, "Wrong data", "Error", JOptionPane.ERROR_MESSAGE)
+			JOptionPane.showMessageDialog(
+				this, "Wrong data", "Error", JOptionPane.ERROR_MESSAGE
+			)
 			return
 		}
 
