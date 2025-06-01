@@ -15,7 +15,7 @@ fun main() {
 	EventQueue.invokeLater {
 		try {
 			UIManager.setLookAndFeel(FlatMTGitHubDarkIJTheme())
-			val frame = GUI()
+			val frame = CipherMachine()
 			frame.isVisible = true
 		} catch (e: Exception) {
 			e.printStackTrace()
@@ -23,27 +23,115 @@ fun main() {
 	}
 }
 
-class GUI : JFrame() {
+class CipherMachine : JFrame() {
 	private var fast: Boolean = true
 
-	private fun selectPath(pathField: JTextField) {
-		val fileChooser = JFileChooser()
-		val result = fileChooser.showOpenDialog(this)
-		if (result == JFileChooser.APPROVE_OPTION) {
-			pathField.text = fileChooser.selectedFile.absolutePath
+	private val inputField: JTextField = JTextField(24)
+	private val outputField: JTextField = JTextField(24)
+
+	private val keyFieldP: JTextField = JTextField(8).apply { text = "5003" }
+	private val keyFieldQ: JTextField = JTextField(8).apply { text = "5227" }
+	private val keyFieldB: JTextField = JTextField(8).apply { text = "1234" }
+
+	init {
+		title = "Rabin Cipher Machine"
+		defaultCloseOperation = EXIT_ON_CLOSE
+		setBounds(100, 100, 600, 270)
+
+		val contentPanel = JPanel().apply {
+			border = EmptyBorder(10, 10, 10, 10)
+			layout = GridLayout(0, 1, 5, 10)
 		}
+
+		val inputPanel = JPanel(BorderLayout(5, 5)).apply {
+			add(JLabel("Input path:").apply {
+				preferredSize = Dimension(100, preferredSize.height)
+			}, BorderLayout.WEST)
+			add(inputField, BorderLayout.CENTER)
+			add(JButton("Browse").apply {
+				preferredSize = Dimension(100, preferredSize.height)
+				addActionListener {
+					selectPath(inputField)
+				}
+			}, BorderLayout.EAST)
+		}
+
+		val outputPanel = JPanel(BorderLayout(5, 5)).apply {
+			add(JLabel("Output path:").apply {
+				preferredSize = Dimension(100, preferredSize.height)
+			}, BorderLayout.WEST)
+			add(outputField, BorderLayout.CENTER)
+			add(JButton("Browse").apply {
+				preferredSize = Dimension(100, preferredSize.height)
+				addActionListener {
+					selectPath(outputField)
+				}
+			}, BorderLayout.EAST)
+		}
+
+		val keyPanel = JPanel(GridLayout(1, 3, 5, 5)).apply {
+			add(JPanel(BorderLayout(5, 5)).apply {
+				add(JLabel("P:"), BorderLayout.WEST)
+				add(keyFieldP, BorderLayout.CENTER)
+			})
+			add(JPanel(BorderLayout(5, 5)).apply {
+				add(JLabel("Q:"), BorderLayout.WEST)
+				add(keyFieldQ, BorderLayout.CENTER)
+			})
+			add(JPanel(BorderLayout(5, 5)).apply {
+				add(JLabel("B:"), BorderLayout.WEST)
+				add(keyFieldB, BorderLayout.CENTER)
+			})
+		}
+
+		val radioPanel = JPanel(GridLayout(1, 2, 5, 5)).apply {
+			val usualButton = JRadioButton("Usual (faster)", true).apply {
+				addActionListener {
+					fast = true
+				}
+			}
+			val bigIntButton = JRadioButton("Big Int (slow)").apply {
+				addActionListener {
+					fast = false
+				}
+			}
+			ButtonGroup().apply {
+				add(usualButton)
+				add(bigIntButton)
+			}
+			add(usualButton)
+			add(bigIntButton)
+		}
+
+		val processPanel = JPanel(GridLayout(1, 2, 5, 5)).apply {
+			add(JButton("Encode").apply {
+				addActionListener {
+					process(true)
+				}
+			})
+			add(JButton("Decode").apply {
+				addActionListener {
+					process(false)
+				}
+			})
+		}
+
+		contentPanel.add(inputPanel)
+		contentPanel.add(outputPanel)
+		contentPanel.add(keyPanel)
+		contentPanel.add(radioPanel)
+		contentPanel.add(processPanel)
+
+		contentPane = contentPanel
+		setLocationRelativeTo(null)
 	}
 
-	private fun error(
-		inputField: JTextField,
-		outputField: JTextField,
-		keyFieldP: JTextField,
-		keyFieldQ: JTextField,
-		keyFieldB: JTextField
-	): Boolean {
+	private fun process(isEncode: Boolean) {
 		if (inputField.text.isEmpty() || outputField.text.isEmpty() || keyFieldP.text.isEmpty() || keyFieldQ.text.isEmpty() || keyFieldB.text.isEmpty()) {
-			JOptionPane.showMessageDialog(this, "Empty fields", "Error", JOptionPane.ERROR_MESSAGE)
-			return true
+			JOptionPane.showMessageDialog(
+				this, "Empty fields", "Error", JOptionPane.ERROR_MESSAGE
+			)
+			return
 		}
 
 		try {
@@ -84,154 +172,42 @@ class GUI : JFrame() {
 			}
 		} catch (_: Exception) {
 			JOptionPane.showMessageDialog(this, "Wrong data", "Error", JOptionPane.ERROR_MESSAGE)
-			return true
+			return
 		}
-		return false
-	}
 
-	private fun decode(
-		inputField: JTextField,
-		outputField: JTextField,
-		keyFieldP: JTextField,
-		keyFieldQ: JTextField,
-		keyFieldB: JTextField
-	) {
-		val error = error(inputField, outputField, keyFieldP, keyFieldQ, keyFieldB)
+		val inputPath = inputField.text
+		val outputPath = outputField.text
 
-		if (!error) {
-			val inputPath = inputField.text
-			val outputPath = outputField.text
-
-			val machine = if (fast) {
-				val keyP = keyFieldP.text.toInt()
-				val keyQ = keyFieldQ.text.toInt()
-				val keyB = keyFieldB.text.toInt()
-
-				DefaultRabin(keyP, keyQ, keyB, inputPath, outputPath)
-			} else {
-				val keyP = keyFieldP.text.toBigInteger()
-				val keyQ = keyFieldQ.text.toBigInteger()
-				val keyB = keyFieldB.text.toBigInteger()
-
-				BigIntegerRabin(keyP, keyQ, keyB, inputPath, outputPath)
-			}
-
-			machine.decode()
-
-			JOptionPane.showMessageDialog(this, "Complete", "Message", JOptionPane.INFORMATION_MESSAGE)
+		val machine = if (fast) {
+			DefaultRabin(
+				keyFieldP.text.toInt(), keyFieldQ.text.toInt(), keyFieldB.text.toInt(), inputPath, outputPath
+			)
+		} else {
+			BigIntegerRabin(
+				keyFieldP.text.toBigInteger(),
+				keyFieldQ.text.toBigInteger(),
+				keyFieldB.text.toBigInteger(),
+				inputPath,
+				outputPath
+			)
 		}
-	}
 
-	private fun encode(
-		inputField: JTextField,
-		outputField: JTextField,
-		keyFieldP: JTextField,
-		keyFieldQ: JTextField,
-		keyFieldB: JTextField
-	) {
-		val error = error(inputField, outputField, keyFieldP, keyFieldQ, keyFieldB)
-
-		if (!error) {
-			val inputPath = inputField.text
-			val outputPath = outputField.text
-
-			val machine = if (fast) {
-				val keyP = keyFieldP.text.toInt()
-				val keyQ = keyFieldQ.text.toInt()
-				val keyB = keyFieldB.text.toInt()
-
-				DefaultRabin(keyP, keyQ, keyB, inputPath, outputPath)
-			} else {
-				val keyP = keyFieldP.text.toBigInteger()
-				val keyQ = keyFieldQ.text.toBigInteger()
-				val keyB = keyFieldB.text.toBigInteger()
-
-				BigIntegerRabin(keyP, keyQ, keyB, inputPath, outputPath)
-			}
-
+		if (isEncode) {
 			machine.encode()
-
-			JOptionPane.showMessageDialog(this, "Complete", "Message", JOptionPane.INFORMATION_MESSAGE)
+		} else {
+			machine.decode()
 		}
+
+		JOptionPane.showMessageDialog(
+			this, "Complete", "Success", JOptionPane.INFORMATION_MESSAGE
+		)
 	}
 
-	init {
-		title = "Rabin Cipher Machine"
-		defaultCloseOperation = EXIT_ON_CLOSE
-		setBounds(100, 100, 500, 210)
-
-		val contentPanel = JPanel()
-		contentPanel.border = EmptyBorder(5, 5, 5, 5)
-		contentPanel.layout = BorderLayout(0, 0)
-		contentPanel.layout = GridLayout(0, 1, 0, 0)
-		contentPane = contentPanel
-
-		val inputPanel = JPanel()
-		val inputLabel = JLabel("Input path:")
-		inputLabel.preferredSize = Dimension(80, inputLabel.preferredSize.height)
-		val inputField = JTextField(24)
-		val inputButton = JButton("Select path")
-		inputButton.addActionListener { selectPath(inputField) }
-		inputPanel.add(inputLabel)
-		inputPanel.add(inputField)
-		inputPanel.add(inputButton)
-
-		val outputPanel = JPanel()
-		val outputLabel = JLabel("Output path:")
-		outputLabel.preferredSize = Dimension(80, outputLabel.preferredSize.height)
-		val outputField = JTextField(24)
-		val outputButton = JButton("Select path")
-		outputButton.addActionListener { selectPath(outputField) }
-		outputPanel.add(outputLabel)
-		outputPanel.add(outputField)
-		outputPanel.add(outputButton)
-
-		val keyPanel = JPanel()
-		val keyLabelP = JLabel("P:")
-		val keyFieldP = JTextField(8)
-		keyFieldP.text = "5003"
-		val keyLabelQ = JLabel("Q:")
-		val keyFieldQ = JTextField(8)
-		keyFieldQ.text = "5227"
-		val keyLabelB = JLabel("B:")
-		val keyFieldB = JTextField(8)
-		keyFieldB.text = "1234"
-		keyPanel.add(keyLabelP)
-		keyPanel.add(keyFieldP)
-		keyPanel.add(keyLabelQ)
-		keyPanel.add(keyFieldQ)
-		keyPanel.add(keyLabelB)
-		keyPanel.add(keyFieldB)
-
-		val radioPanel = JPanel()
-		val radioButtonUW = JRadioButton("Usual (faster)")
-		val radioButtonBI = JRadioButton("Big Int (slow)")
-		radioButtonUW.isSelected = true
-		radioButtonUW.addActionListener {
-			fast = true
-			radioButtonBI.isSelected = false
+	private fun selectPath(field: JTextField) {
+		JFileChooser().run {
+			if (showOpenDialog(this@CipherMachine) == JFileChooser.APPROVE_OPTION) {
+				field.text = selectedFile.absolutePath
+			}
 		}
-		radioButtonBI.addActionListener {
-			fast = false
-			radioButtonUW.isSelected = false
-		}
-		radioPanel.add(radioButtonUW)
-		radioPanel.add(radioButtonBI)
-
-		val processPanel = JPanel()
-		val processEncode = JButton("Encode")
-		val processDecode = JButton("Decode")
-		processEncode.addActionListener { encode(inputField, outputField, keyFieldP, keyFieldQ, keyFieldB) }
-		processDecode.addActionListener { decode(inputField, outputField, keyFieldP, keyFieldQ, keyFieldB) }
-		processPanel.add(processEncode)
-		processPanel.add(processDecode)
-
-		contentPanel.add(inputPanel)
-		contentPanel.add(outputPanel)
-		contentPanel.add(keyPanel)
-		contentPanel.add(radioPanel)
-		contentPanel.add(processPanel)
-
-		setLocationRelativeTo(null)
 	}
 }

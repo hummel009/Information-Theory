@@ -80,13 +80,19 @@ class CipherMachine : JFrame() {
 
 		val dataPanel = JPanel(GridLayout(1, 3, 5, 5)).apply {
 			add(JButton("Source").apply {
-				addActionListener { ScrollWindow("Source", srcFileBin) }
+				addActionListener {
+					ScrollWindow("Source", srcFileBin)
+				}
 			})
 			add(JButton("Stream").apply {
-				addActionListener { ScrollWindow("Stream", keyStream) }
+				addActionListener {
+					ScrollWindow("Stream", keyStream)
+				}
 			})
 			add(JButton("Result").apply {
-				addActionListener { ScrollWindow("Result", resFileBin) }
+				addActionListener {
+					ScrollWindow("Result", resFileBin)
+				}
 			})
 		}
 
@@ -97,12 +103,14 @@ class CipherMachine : JFrame() {
 		contentPanel.add(dataPanel)
 
 		contentPane = contentPanel
+
 		setLocationRelativeTo(null)
 	}
 
 	private fun process() {
 		val outputPath = outputField.text
 		val inputPath = inputField.text
+
 		val key = keyField.text.uppercase(Locale.getDefault()).filter { it in "01" }
 
 		if (inputPath.isEmpty() || outputPath.isEmpty() || key.length != 34) {
@@ -113,14 +121,14 @@ class CipherMachine : JFrame() {
 		}
 
 		val encoder = Encoder(intArrayOf(34, 15, 14, 1), key, inputPath, outputPath)
-		val (src, stream, res) = encoder.encode()
+		val (srcFileBin, keyStream, resFileBin) = encoder.encode()
 
-		srcFileBin = src
-		keyStream = stream
-		resFileBin = res
+		this.srcFileBin = srcFileBin
+		this.keyStream = keyStream
+		this.resFileBin = resFileBin
 
 		JOptionPane.showMessageDialog(
-			this, "Complete", "Message", JOptionPane.INFORMATION_MESSAGE
+			this, "Complete", "Success", JOptionPane.INFORMATION_MESSAGE
 		)
 	}
 
@@ -139,17 +147,17 @@ class ScrollWindow(name: String, data: String) : JFrame() {
 		layout = BorderLayout()
 		setSize(300, 300)
 
-		val textArea = JTextArea(data)
-		textArea.font = Font("Arial", Font.PLAIN, 16)
-		textArea.lineWrap = true
-		textArea.wrapStyleWord = true
-		textArea.caretPosition = 0
+		add(JScrollPane(JTextArea(data).apply {
+			font = Font("Arial", Font.PLAIN, 16)
+			lineWrap = true
+			wrapStyleWord = true
+			caretPosition = 0
+		}).apply {
+			verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_ALWAYS
+		}, BorderLayout.CENTER)
 
-		val scrollPane = JScrollPane(textArea)
-		scrollPane.verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_ALWAYS
-
-		add(scrollPane, BorderLayout.CENTER)
 		setLocationRelativeTo(null)
+
 		isVisible = true
 	}
 }

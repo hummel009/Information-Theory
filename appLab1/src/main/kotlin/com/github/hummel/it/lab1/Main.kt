@@ -115,12 +115,25 @@ class CipherMachine : JFrame() {
 		contentPanel.add(processPanel)
 
 		contentPane = contentPanel
+
 		setLocationRelativeTo(null)
 	}
 
 	private fun process(isEncode: Boolean) {
-		val (hasError, key, message) = validateInputs()
-		if (hasError) {
+		if (inputField.text.isEmpty() || outputField.text.isEmpty()) {
+			JOptionPane.showMessageDialog(
+				this, "Empty fields", "Error", JOptionPane.ERROR_MESSAGE
+			)
+			return
+		}
+
+		val key = keyField.text.uppercase(Locale.getDefault()).filter { it in alphabet }
+		val message = File(inputField.text).readText().uppercase(Locale.getDefault()).filter { it in alphabet }
+
+		if (key.isEmpty() || message.isEmpty()) {
+			JOptionPane.showMessageDialog(
+				this, "Invalid key or message content", "Error", JOptionPane.ERROR_MESSAGE
+			)
 			return
 		}
 
@@ -135,30 +148,10 @@ class CipherMachine : JFrame() {
 		}
 
 		File(outputField.text).writeText(result)
+
 		JOptionPane.showMessageDialog(
-			this, "Operation completed", "Success", JOptionPane.INFORMATION_MESSAGE
+			this, "Complete", "Success", JOptionPane.INFORMATION_MESSAGE
 		)
-	}
-
-	private fun validateInputs(): Triple<Boolean, String, String> {
-		if (inputField.text.isEmpty() || outputField.text.isEmpty()) {
-			JOptionPane.showMessageDialog(
-				this, "Please fill all fields", "Error", JOptionPane.ERROR_MESSAGE
-			)
-			return Triple(true, "", "")
-		}
-
-		val key = keyField.text.uppercase(Locale.getDefault()).filter { it in alphabet }
-		val message = File(inputField.text).readText().uppercase(Locale.getDefault()).filter { it in alphabet }
-
-		if (key.isEmpty() || message.isEmpty()) {
-			JOptionPane.showMessageDialog(
-				this, "Invalid key or message content", "Error", JOptionPane.ERROR_MESSAGE
-			)
-			return Triple(true, "", "")
-		}
-
-		return Triple(false, key, message)
 	}
 
 	private fun selectPath(field: JTextField) {
