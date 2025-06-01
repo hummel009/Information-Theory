@@ -63,7 +63,7 @@ class CipherMachine : JFrame() {
 				preferredSize = Dimension(100, preferredSize.height)
 			}, BorderLayout.WEST)
 			add(inputField, BorderLayout.CENTER)
-			add(JButton("Select...").apply {
+			add(JButton("Browse").apply {
 				preferredSize = Dimension(100, preferredSize.height)
 				addActionListener { selectPath(inputField) }
 			}, BorderLayout.EAST)
@@ -74,7 +74,7 @@ class CipherMachine : JFrame() {
 				preferredSize = Dimension(100, preferredSize.height)
 			}, BorderLayout.WEST)
 			add(outputField, BorderLayout.CENTER)
-			add(JButton("Select...").apply {
+			add(JButton("Browse").apply {
 				preferredSize = Dimension(100, preferredSize.height)
 				addActionListener { selectPath(outputField) }
 			}, BorderLayout.EAST)
@@ -123,12 +123,16 @@ class CipherMachine : JFrame() {
 		}
 
 		File(outputField.text).writeText(result)
-		JOptionPane.showMessageDialog(this, "Operation completed", "Success", JOptionPane.INFORMATION_MESSAGE)
+		JOptionPane.showMessageDialog(
+			this, "Operation completed", "Success", JOptionPane.INFORMATION_MESSAGE
+		)
 	}
 
 	private fun validateInputs(): Triple<Boolean, String, String> {
 		if (inputField.text.isEmpty() || outputField.text.isEmpty()) {
-			showError("Please fill all fields")
+			JOptionPane.showMessageDialog(
+				this, "Please fill all fields", "Error", JOptionPane.ERROR_MESSAGE
+			)
 			return Triple(true, "", "")
 		}
 
@@ -136,7 +140,9 @@ class CipherMachine : JFrame() {
 		val message = File(inputField.text).readText().uppercase(Locale.getDefault()).filter { it in alphabet }
 
 		if (key.isEmpty() || message.isEmpty()) {
-			showError("Invalid key or message content")
+			JOptionPane.showMessageDialog(
+				this, "Invalid key or message content", "Error", JOptionPane.ERROR_MESSAGE
+			)
 			return Triple(true, "", "")
 		}
 
@@ -149,9 +155,5 @@ class CipherMachine : JFrame() {
 				field.text = selectedFile.absolutePath
 			}
 		}
-	}
-
-	private fun showError(message: String) {
-		JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE)
 	}
 }

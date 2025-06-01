@@ -12,7 +12,7 @@ fun main() {
 	EventQueue.invokeLater {
 		try {
 			UIManager.setLookAndFeel(FlatMTGitHubDarkIJTheme())
-			val frame = GUI()
+			val frame = CipherMachine()
 			frame.isVisible = true
 		} catch (e: Exception) {
 			e.printStackTrace()
@@ -20,33 +20,10 @@ fun main() {
 	}
 }
 
-class GUI : JFrame() {
+class CipherMachine : JFrame() {
 	var srcFileBin: String = ""
 	var resFileBin: String = ""
 	var keyStream: String = ""
-
-	private fun selectPath(pathField: JTextField) {
-		val fileChooser = JFileChooser()
-		val result = fileChooser.showOpenDialog(this)
-		if (result == JFileChooser.APPROVE_OPTION) {
-			pathField.text = fileChooser.selectedFile.absolutePath
-		}
-	}
-
-	private fun process(inputField: JTextField, outputField: JTextField, keyField: JTextField) {
-		val outputPath = outputField.text
-		val inputPath = inputField.text
-		val key = keyField.text.uppercase(Locale.getDefault()).filter { it in "01" }
-
-		if (inputPath.isEmpty() || outputPath.isEmpty() || key.length != 34) {
-			JOptionPane.showMessageDialog(this, "Empty fields", "Error", JOptionPane.ERROR_MESSAGE)
-			return
-		}
-
-		val encoder = Encoder(intArrayOf(34, 15, 14, 1), key, inputPath, outputPath, this)
-		encoder.encode()
-		JOptionPane.showMessageDialog(this, "Complete", "Message", JOptionPane.INFORMATION_MESSAGE)
-	}
 
 	init {
 		title = "Polynomial Cipher Machine"
@@ -108,6 +85,34 @@ class GUI : JFrame() {
 		contentPanel.add(dataPanel)
 
 		setLocationRelativeTo(null)
+	}
+
+	private fun process(inputField: JTextField, outputField: JTextField, keyField: JTextField) {
+		val outputPath = outputField.text
+		val inputPath = inputField.text
+		val key = keyField.text.uppercase(Locale.getDefault()).filter { it in "01" }
+
+		if (inputPath.isEmpty() || outputPath.isEmpty() || key.length != 34) {
+			JOptionPane.showMessageDialog(this, "Empty fields", "Error", JOptionPane.ERROR_MESSAGE)
+			return
+		}
+
+		val encoder = Encoder(intArrayOf(34, 15, 14, 1), key, inputPath, outputPath)
+		val (srcFileBin, keyStream, resFileBin) = encoder.encode()
+
+		this.srcFileBin = srcFileBin
+		this.keyStream = keyStream
+		this.resFileBin = resFileBin
+
+		JOptionPane.showMessageDialog(this, "Complete", "Message", JOptionPane.INFORMATION_MESSAGE)
+	}
+
+	private fun selectPath(field: JTextField) {
+		JFileChooser().run {
+			if (showOpenDialog(this@CipherMachine) == JFileChooser.APPROVE_OPTION) {
+				field.text = selectedFile.absolutePath
+			}
+		}
 	}
 }
 

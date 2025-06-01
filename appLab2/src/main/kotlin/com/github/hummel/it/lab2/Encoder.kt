@@ -9,11 +9,10 @@ class Encoder(
 	private var polynomialPowers: IntArray,
 	private var initialKey: String,
 	private var pathToSrcFile: String,
-	private var pathToResFile: String,
-	private var gui: GUI
+	private var pathToResFile: String
 ) {
 
-	fun encode() {
+	fun encode(): Triple<String, String, String> {
 		val reg = Register(polynomialPowers, initialKey)
 		val srcBytes = File(pathToSrcFile).readBytes()
 		val resBytes = srcBytes.copyOf()
@@ -43,8 +42,11 @@ class Encoder(
 			currKey.clear()
 		}
 		File(pathToResFile).writeBytes(resBytes)
-		gui.srcFileBin = "$bufSrcFile".replace(" ", "")
-		gui.keyStream = "$bufGenkey".replace(" ", "")
-		gui.resFileBin = "$bufResFile".replace(" ", "")
+
+		return Triple(
+			"$bufSrcFile".replace(" ", ""),
+			"$bufSrcFile".replace(" ", ""),
+			"$bufResFile".replace(" ", "")
+		)
 	}
 }
