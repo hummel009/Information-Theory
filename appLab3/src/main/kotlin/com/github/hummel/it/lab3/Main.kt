@@ -123,6 +123,7 @@ class CipherMachine : JFrame() {
 		contentPanel.add(processPanel)
 
 		contentPane = contentPanel
+
 		setLocationRelativeTo(null)
 	}
 
@@ -181,11 +182,11 @@ class CipherMachine : JFrame() {
 		val outputPath = outputField.text
 
 		val machine = if (fast) {
-			DefaultRabin(
+			RabinDefault(
 				keyFieldP.text.toInt(), keyFieldQ.text.toInt(), keyFieldB.text.toInt(), inputPath, outputPath
 			)
 		} else {
-			BigIntegerRabin(
+			RabinBigInteger(
 				keyFieldP.text.toBigInteger(),
 				keyFieldQ.text.toBigInteger(),
 				keyFieldB.text.toBigInteger(),

@@ -26,131 +26,113 @@ fun main() {
 class CipherMachine : JFrame() {
 	private var mode: SignMode = SignMode.RUS
 
+	private val inputField: JTextField = JTextField(24)
+	private val outputField: JTextField = JTextField(24)
+	private val keyFieldQ: JTextField = JTextField(8).apply { text = "107" }
+	private val keyFieldP: JTextField = JTextField(8).apply { text = "643" }
+	private val keyFieldH: JTextField = JTextField(8).apply { text = "2" }
+	private val keyFieldK: JTextField = JTextField(8).apply { text = "31" }
+	private val keyFieldX: JTextField = JTextField(8).apply { text = "45" }
+	private val keyFieldY: JTextField = JTextField(8).apply { text = "0" }
+	private val keyFieldM: JTextField = JTextField(8).apply { text = "323" }
+
 	init {
 		title = "DSA Signer Machine"
 		defaultCloseOperation = EXIT_ON_CLOSE
-		setBounds(100, 100, 550, 250)
+		setBounds(100, 100, 600, 324)
 
-		val contentPanel = JPanel()
-		contentPanel.border = EmptyBorder(5, 5, 5, 5)
-		contentPanel.layout = BorderLayout(0, 0)
-		contentPanel.layout = GridLayout(0, 1, 0, 0)
-		contentPane = contentPanel
-
-		val inputPanel = JPanel()
-		val inputLabel = JLabel("Input path:")
-		inputLabel.preferredSize = Dimension(80, inputLabel.preferredSize.height)
-		val inputField = JTextField(24)
-		val inputButton = JButton("Select path")
-		inputButton.addActionListener { selectPath(inputField) }
-		inputPanel.add(inputLabel)
-		inputPanel.add(inputField)
-		inputPanel.add(inputButton)
-
-		val outputPanel = JPanel()
-		val outputLabel = JLabel("Output path:")
-		outputLabel.preferredSize = Dimension(80, outputLabel.preferredSize.height)
-		val outputField = JTextField(24)
-		val outputButton = JButton("Select path")
-		outputButton.addActionListener { selectPath(outputField) }
-		outputPanel.add(outputLabel)
-		outputPanel.add(outputField)
-		outputPanel.add(outputButton)
-
-		val keyPanel1 = JPanel()
-		val keyLabelQ = JLabel("Q:")
-		keyLabelQ.preferredSize = Dimension(15, keyLabelQ.preferredSize.height)
-		val keyFieldQ = JTextField(8)
-		keyFieldQ.text = "107"
-		val keyLabelP = JLabel("P:")
-		keyLabelP.preferredSize = Dimension(15, keyLabelP.preferredSize.height)
-		val keyFieldP = JTextField(8)
-		keyFieldP.text = "643"
-		val keyLabelH = JLabel("H:")
-		keyLabelH.preferredSize = Dimension(15, keyLabelH.preferredSize.height)
-		val keyFieldH = JTextField(8)
-		keyFieldH.text = "2"
-		val keyLabelK = JLabel("K:")
-		keyLabelK.preferredSize = Dimension(15, keyLabelK.preferredSize.height)
-		val keyFieldK = JTextField(8)
-		keyFieldK.text = "31"
-		keyPanel1.add(keyLabelQ)
-		keyPanel1.add(keyFieldQ)
-		keyPanel1.add(keyLabelP)
-		keyPanel1.add(keyFieldP)
-		keyPanel1.add(keyLabelH)
-		keyPanel1.add(keyFieldH)
-		keyPanel1.add(keyLabelK)
-		keyPanel1.add(keyFieldK)
-
-		val keyPanel2 = JPanel()
-		val keyLabelX = JLabel("X:")
-		keyLabelX.preferredSize = Dimension(15, keyLabelX.preferredSize.height)
-		val keyFieldX = JTextField(8)
-		keyFieldX.text = "45"
-		val keyLabelY = JLabel("Y:")
-		keyLabelY.preferredSize = Dimension(15, keyLabelY.preferredSize.height)
-		val keyFieldY = JTextField(8)
-		keyFieldY.text = "0"
-		val keyLabelM = JLabel("M:")
-		keyLabelM.preferredSize = Dimension(15, keyLabelM.preferredSize.height)
-		val keyFieldM = JTextField(8)
-		keyFieldM.text = "323"
-		keyPanel2.add(keyLabelX)
-		keyPanel2.add(keyFieldX)
-		keyPanel2.add(keyLabelY)
-		keyPanel2.add(keyFieldY)
-		keyPanel2.add(keyLabelM)
-		keyPanel2.add(keyFieldM)
-
-		val radioPanel = JPanel()
-		val radioButtonRus = JRadioButton("RUS")
-		val radioButtonEng = JRadioButton("ENG")
-		val radioButtonAsc = JRadioButton("ASC")
-		val radioButtonBin = JRadioButton("BIN")
-		radioButtonRus.isSelected = true
-
-		radioButtonRus.addActionListener {
-			mode = SignMode.RUS
-			radioButtonEng.isSelected = false
-			radioButtonAsc.isSelected = false
-			radioButtonBin.isSelected = false
-		}
-		radioButtonEng.addActionListener {
-			mode = SignMode.ENG
-			radioButtonRus.isSelected = false
-			radioButtonAsc.isSelected = false
-			radioButtonBin.isSelected = false
-		}
-		radioButtonAsc.addActionListener {
-			mode = SignMode.ASC
-			radioButtonRus.isSelected = false
-			radioButtonEng.isSelected = false
-			radioButtonBin.isSelected = false
-		}
-		radioButtonBin.addActionListener {
-			mode = SignMode.BIN
-			radioButtonRus.isSelected = false
-			radioButtonAsc.isSelected = false
-			radioButtonEng.isSelected = false
+		val contentPanel = JPanel().apply {
+			border = EmptyBorder(10, 10, 10, 10)
+			layout = GridLayout(0, 1, 5, 10)
 		}
 
-		radioPanel.add(radioButtonRus)
-		radioPanel.add(radioButtonEng)
-		radioPanel.add(radioButtonAsc)
-		radioPanel.add(radioButtonBin)
+		val inputPanel = JPanel(BorderLayout(5, 5)).apply {
+			add(JLabel("Input path:").apply {
+				preferredSize = Dimension(100, preferredSize.height)
+			}, BorderLayout.WEST)
+			add(inputField, BorderLayout.CENTER)
+			add(JButton("Browse").apply {
+				preferredSize = Dimension(100, preferredSize.height)
+				addActionListener {
+					selectPath(inputField)
+				}
+			}, BorderLayout.EAST)
+		}
 
-		val processPanel = JPanel()
-		val processEnsign = JButton("Ensign")
-		val processDesign = JButton("Design")
-		processEnsign.addActionListener {
-			ensign(inputField, outputField, keyFieldQ, keyFieldP, keyFieldH, keyFieldX, keyFieldY, keyFieldK, keyFieldM)
+		val outputPanel = JPanel(BorderLayout(5, 5)).apply {
+			add(JLabel("Output path:").apply {
+				preferredSize = Dimension(100, preferredSize.height)
+			}, BorderLayout.WEST)
+			add(outputField, BorderLayout.CENTER)
+			add(JButton("Browse").apply {
+				preferredSize = Dimension(100, preferredSize.height)
+				addActionListener {
+					selectPath(outputField)
+				}
+			}, BorderLayout.EAST)
 		}
-		processDesign.addActionListener {
-			design(inputField, outputField, keyFieldQ, keyFieldP, keyFieldH, keyFieldX, keyFieldY, keyFieldK, keyFieldM)
+
+		val keyPanel1 = JPanel(GridLayout(1, 4, 5, 5)).apply {
+			add(JPanel(BorderLayout(5, 5)).apply {
+				add(JLabel("Q:"), BorderLayout.WEST)
+				add(keyFieldQ, BorderLayout.CENTER)
+			})
+			add(JPanel(BorderLayout(5, 5)).apply {
+				add(JLabel("P:"), BorderLayout.WEST)
+				add(keyFieldP, BorderLayout.CENTER)
+			})
+			add(JPanel(BorderLayout(5, 5)).apply {
+				add(JLabel("H:"), BorderLayout.WEST)
+				add(keyFieldH, BorderLayout.CENTER)
+			})
+			add(JPanel(BorderLayout(5, 5)).apply {
+				add(JLabel("K:"), BorderLayout.WEST)
+				add(keyFieldK, BorderLayout.CENTER)
+			})
 		}
-		processPanel.add(processEnsign)
-		processPanel.add(processDesign)
+
+		val keyPanel2 = JPanel(GridLayout(1, 3, 5, 5)).apply {
+			add(JPanel(BorderLayout(5, 5)).apply {
+				add(JLabel("X:"), BorderLayout.WEST)
+				add(keyFieldX, BorderLayout.CENTER)
+			})
+			add(JPanel(BorderLayout(5, 5)).apply {
+				add(JLabel("Y:"), BorderLayout.WEST)
+				add(keyFieldY, BorderLayout.CENTER)
+			})
+			add(JPanel(BorderLayout(5, 5)).apply {
+				add(JLabel("M:"), BorderLayout.WEST)
+				add(keyFieldM, BorderLayout.CENTER)
+			})
+		}
+
+		val radioPanel = JPanel(GridLayout(1, 2, 5, 5)).apply {
+			val group = ButtonGroup()
+			val modes = SignMode.entries.toTypedArray()
+
+			modes.forEach { signMode ->
+				val button = JRadioButton(signMode.name, signMode == mode).apply {
+					addActionListener {
+						mode = signMode
+					}
+					group.add(this)
+				}
+				add(button)
+			}
+		}
+
+		val processPanel = JPanel(GridLayout(1, 2, 5, 5)).apply {
+			add(JButton("Ensign").apply {
+				addActionListener {
+					ensign()
+				}
+			})
+			add(JButton("Design").apply {
+				addActionListener {
+					design()
+				}
+			})
+		}
 
 		contentPanel.add(inputPanel)
 		contentPanel.add(outputPanel)
@@ -159,126 +141,102 @@ class CipherMachine : JFrame() {
 		contentPanel.add(radioPanel)
 		contentPanel.add(processPanel)
 
+		contentPane = contentPanel
+
 		setLocationRelativeTo(null)
 	}
 
-	private fun ensign(
-		inputField: JTextField,
-		outputField: JTextField,
-		keyFieldQ: JTextField,
-		keyFieldP: JTextField,
-		keyFieldH: JTextField,
-		keyFieldX: JTextField,
-		keyFieldY: JTextField,
-		keyFieldK: JTextField,
-		keyFieldM: JTextField
-	) {
-		if (error(
-				inputField, outputField, keyFieldQ, keyFieldP, keyFieldH, keyFieldX, keyFieldY, keyFieldK, keyFieldM
-			)
-		) {
-			return
-		}
+	private fun ensign() {
+		val error =
+			error(inputField, outputField, keyFieldQ, keyFieldP, keyFieldH, keyFieldX, keyFieldY, keyFieldK, keyFieldM)
 
 		if (keyFieldX.text.isEmpty()) {
 			JOptionPane.showMessageDialog(this, "Select X", "Error", JOptionPane.ERROR_MESSAGE)
 			return
 		}
 
-		val inputPath = inputField.text
-		val outputPath = outputField.text
-		val q = keyFieldQ.text.toBigInteger()
-		val p = keyFieldP.text.toBigInteger()
-		val h = keyFieldH.text.toBigInteger()
-		val x = keyFieldX.text.toBigInteger()
-		val k = keyFieldK.text.toBigInteger()
-		val m = keyFieldM.text.toBigInteger()
+		if (!error) {
+			val inputPath = inputField.text
+			val outputPath = outputField.text
+			val q = keyFieldQ.text.toBigInteger()
+			val p = keyFieldP.text.toBigInteger()
+			val h = keyFieldH.text.toBigInteger()
+			val x = keyFieldX.text.toBigInteger()
+			val k = keyFieldK.text.toBigInteger()
+			val m = keyFieldM.text.toBigInteger()
 
-		val signer = Signer(inputPath, outputPath, q, p, h, k, m)
+			val signer = Signer(inputPath, outputPath, q, p, h, k, m)
+			val cortege = try {
+				signer.ensign(mode, x)
+			} catch (_: Exception) {
+				null
+			}
 
-		val cortege = try {
-			signer.ensign(mode, x)
-		} catch (_: Exception) {
-			null
-		}
-
-		cortege?.let {
-			val hash = it.value1
-			val r = it.value2
-			val s = it.value3
-			val y = it.value4
-			JOptionPane.showMessageDialog(
-				this, "Hash = $hash, r = $r, s = $s, y = $y", "Message", JOptionPane.INFORMATION_MESSAGE
-			)
-			keyFieldX.text = "0"
-			keyFieldY.text = "$y"
-		} ?: run {
-			JOptionPane.showMessageDialog(
-				this, "Broken file", "Error", JOptionPane.ERROR_MESSAGE
-			)
+			cortege?.let {
+				val hash = it.value1
+				val r = it.value2
+				val s = it.value3
+				val y = it.value4
+				JOptionPane.showMessageDialog(
+					this, "Hash = $hash, r = $r, s = $s, y = $y", "Message", JOptionPane.INFORMATION_MESSAGE
+				)
+				keyFieldX.text = "0"
+				keyFieldY.text = "$y"
+			} ?: run {
+				JOptionPane.showMessageDialog(
+					this, "Broken file", "Error", JOptionPane.ERROR_MESSAGE
+				)
+			}
 		}
 	}
 
-	private fun design(
-		inputField: JTextField,
-		outputField: JTextField,
-		keyFieldQ: JTextField,
-		keyFieldP: JTextField,
-		keyFieldH: JTextField,
-		keyFieldX: JTextField,
-		keyFieldY: JTextField,
-		keyFieldK: JTextField,
-		keyFieldM: JTextField
-	) {
-		if (error(
-				inputField, outputField, keyFieldQ, keyFieldP, keyFieldH, keyFieldX, keyFieldY, keyFieldK, keyFieldM
-			)
-		) {
-			return
-		}
+	private fun design() {
+		val error =
+			error(inputField, outputField, keyFieldQ, keyFieldP, keyFieldH, keyFieldX, keyFieldY, keyFieldK, keyFieldM)
 
 		if (keyFieldY.text.isEmpty()) {
 			JOptionPane.showMessageDialog(this, "Select Y", "Error", JOptionPane.ERROR_MESSAGE)
 			return
 		}
 
-		val inputPath = inputField.text
-		val outputPath = outputField.text
-		val q = keyFieldQ.text.toBigInteger()
-		val p = keyFieldP.text.toBigInteger()
-		val h = keyFieldH.text.toBigInteger()
-		val y = keyFieldY.text.toBigInteger()
-		val k = keyFieldK.text.toBigInteger()
-		val m = keyFieldM.text.toBigInteger()
+		if (!error) {
+			val inputPath = inputField.text
+			val outputPath = outputField.text
+			val q = keyFieldQ.text.toBigInteger()
+			val p = keyFieldP.text.toBigInteger()
+			val h = keyFieldH.text.toBigInteger()
+			val y = keyFieldY.text.toBigInteger()
+			val k = keyFieldK.text.toBigInteger()
+			val m = keyFieldM.text.toBigInteger()
 
-		val signer = Signer(inputPath, outputPath, q, p, h, k, m)
+			val signer = Signer(inputPath, outputPath, q, p, h, k, m)
+			val cortege = try {
+				signer.design(mode, y)
+			} catch (_: Exception) {
+				null
+			}
 
-		val cortege = try {
-			signer.design(mode, y)
-		} catch (_: Exception) {
-			null
-		}
-
-		cortege?.let {
-			val hash = it.value1
-			val r = it.value2
-			val s = it.value3
-			val w = it.value4
-			val u1 = it.value5
-			val u2 = it.value6
-			val v = it.value7
-			JOptionPane.showMessageDialog(
-				this,
-				"Hash = $hash, R = $r, S = $s, W = $w, U1 = $u1, U2 = $u2, V = $v\r\n${r == v}",
-				"Message",
-				JOptionPane.INFORMATION_MESSAGE
-			)
-			keyFieldX.text = "45"
-			keyFieldY.text = "0"
-		} ?: run {
-			JOptionPane.showMessageDialog(
-				this, "Broken file", "Error", JOptionPane.ERROR_MESSAGE
-			)
+			cortege?.let {
+				val hash = it.value1
+				val r = it.value2
+				val s = it.value3
+				val w = it.value4
+				val u1 = it.value5
+				val u2 = it.value6
+				val v = it.value7
+				JOptionPane.showMessageDialog(
+					this,
+					"Hash = $hash, R = $r, S = $s, W = $w, U1 = $u1, U2 = $u2, V = $v\r\n${r == v}",
+					"Message",
+					JOptionPane.INFORMATION_MESSAGE
+				)
+				keyFieldX.text = "45"
+				keyFieldY.text = "0"
+			} ?: run {
+				JOptionPane.showMessageDialog(
+					this, "Broken file", "Error", JOptionPane.ERROR_MESSAGE
+				)
+			}
 		}
 	}
 
@@ -316,7 +274,6 @@ class CipherMachine : JFrame() {
 		}
 		return false
 	}
-
 
 	private fun selectPath(field: JTextField) {
 		JFileChooser().run {

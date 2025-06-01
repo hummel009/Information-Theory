@@ -3,7 +3,7 @@ package com.github.hummel.it.lab3
 import java.io.File
 import java.math.BigInteger
 
-class BigIntegerRabin(
+class RabinBigInteger(
 	private var p: BigInteger,
 	private var q: BigInteger,
 	private var b: BigInteger,

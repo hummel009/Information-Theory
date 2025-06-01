@@ -2,7 +2,7 @@ package com.github.hummel.it.lab3
 
 import java.io.File
 
-class DefaultRabin(
+class RabinDefault(
 	private var p: Int, private var q: Int, private var b: Int, private var input: String, private var output: String
 ) : Rabin {
 	private val n: Int = p * q
