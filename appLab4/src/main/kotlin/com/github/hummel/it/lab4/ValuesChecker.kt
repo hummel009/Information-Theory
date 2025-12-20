@@ -31,7 +31,7 @@ object ValuesChecker {
 	}
 
 	fun checkInterval(leftBound: BigInteger, rightBound: BigInteger, value: BigInteger) {
-		if (value < leftBound || value > rightBound) {
+		if (value !in leftBound..rightBound) {
 			throw Exception()
 		}
 	}

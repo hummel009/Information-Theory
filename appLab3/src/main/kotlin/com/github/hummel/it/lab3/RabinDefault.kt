@@ -28,9 +28,7 @@ class RabinDefault(
 			val mP = Utils.powMod(d.toLong(), (p + 1).toLong() / 4, p.toLong())
 			val mQ = Utils.powMod(d.toLong(), (q + 1).toLong() / 4, q.toLong())
 
-			val ypq = Utils.advancedEuclidAlgorithm(p.toLong(), q.toLong())
-			val yP = ypq.first
-			val yQ = ypq.second
+			val (yP, yQ) = Utils.advancedEuclidAlgorithm(p.toLong(), q.toLong())
 
 			val dS = IntArray(4)
 			val yPBig = yP.toBigInteger()

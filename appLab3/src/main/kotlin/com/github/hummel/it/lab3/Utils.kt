@@ -93,7 +93,7 @@ object Utils {
 					j++
 				}
 				if (x != n - 1) {
-					return false
+					return@isPrime false
 				}
 			}
 		}

@@ -35,9 +35,7 @@ class RabinBigInteger(
 			val mP = d.modPow(((p + BigInteger.ONE) / 4.toBigInteger()), p)
 			val mQ = d.modPow(((q + BigInteger.ONE) / 4.toBigInteger()), q)
 
-			val ypq = Utils.advancedEuclidAlgorithmBI(p, q)
-			val yP = ypq.first
-			val yQ = ypq.second
+			val (yP, yQ) = Utils.advancedEuclidAlgorithmBI(p, q)
 
 			val dS = Array<BigInteger>(4) { BigInteger.ZERO }
 			dS[0] = (yP * p * mQ + yQ * q * mP).mod(n)
